@@ -1,22 +1,26 @@
+#include <ios>
 #include <iostream>
+#include <string>
 #include <vector>
 #include <regex>
+#include <limits>
 using namespace std;
 
+const int ALLOWED_ATTEMPTS = 3;
 
 class Product 
 {
 /// @Product information
 private:
 
-    long productID;
+    string productID;
     string productName;
     int productQuantaty;
     float productPrice;
 
 public:
 
-    Product(long productID, string productName, int productQuantaty, float productPrice)
+    Product(string productID, string productName, int productQuantaty, float productPrice)
     {
         this->productID = productID;
         this->productName = productName;
@@ -29,7 +33,7 @@ public:
         this->productID = productId;
     }
 
-    int getID() 
+    string getID() 
     {
         return this->productID;
     }
@@ -126,7 +130,7 @@ public:
         }
     } // addProduct
 
-    void removeProduct(long id)
+    void removeProduct(string id)
     {
         bool present = false;
         for (auto i = products.begin(); i != products.end(); ++i)
@@ -195,6 +199,36 @@ public:
 
 };
 
+
+template <typename T>
+T getInputNum() {
+  string input;
+  T number;
+  regex intPattern("^(0|[1-9][0-9]*)$");
+  regex floatPattern("^(0|[1-9][0-9]*\\.?[0-9]*)$");
+  for (int i = 0; i != ALLOWED_ATTEMPTS; ++i) //three attemps allowed
+  {
+    std::cin >> input;
+    if (regex_match(input, intPattern))
+    {
+      number = stoi(input);
+      break;
+    }
+    else if (regex_match(input, floatPattern))
+    {
+      number = stof(input);
+      break;
+    }
+    else 
+    { 
+      cout << "\nWrong input, please insert again: ";
+      cin.clear();
+      cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+  }
+  return number;
+}
+
 int main()
 {
     
@@ -210,7 +244,7 @@ int main()
     {
         case '1':
         {   
-            long productID;
+            string productID;
             string productName;
             int productQuantaty;
             float productPrice;
@@ -222,9 +256,9 @@ int main()
             cout << "Product name: ";
             getline(std::cin, productName);
             cout << "Product quantaty: ";
-            cin >> productQuantaty;
+            productQuantaty = getInputNum<int>(); 
             cout << "Prooduct price: ";
-            cin >> productPrice;
+            productPrice = getInputNum<float>();
 
             Product product(productID, productName, productQuantaty, productPrice);
             inventory.addProduct(product);
@@ -233,7 +267,7 @@ int main()
         }
         case '2':
         {
-            long id;
+            string id;
             cout << "Insert ID number to erase product: ";
             cin >> id;
             inventory.removeProduct(id);
