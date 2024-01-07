@@ -8,6 +8,35 @@ using namespace std;
 
 const int ALLOWED_ATTEMPTS = 3;
 
+template <typename T>
+T getInputNum() {
+  string input;
+  T number;
+  regex intPattern("^(0|[1-9][0-9]*)$");
+  regex floatPattern("^(0|[1-9][0-9]*\\.?[0-9]*)$");
+  for (int i = 0; i != ALLOWED_ATTEMPTS; ++i) //three attemps allowed
+  {
+    std::cin >> input;
+    if (regex_match(input, intPattern))
+    {
+      number = stoi(input);
+      break;
+    }
+    else if (regex_match(input, floatPattern))
+    {
+      number = stof(input);
+      break;
+    }
+    else 
+    { 
+      cout << "\nWrong input, please insert again: ";
+      cin.clear();
+      cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+  }
+  return number;
+}
+
 class Product 
 {
 /// @Product information
@@ -28,7 +57,7 @@ public:
         this->productPrice = productPrice;
     }
 
-    void setID(long productId)
+    void setID(string productId)
     {
         this->productID = productId;
     }
@@ -153,7 +182,7 @@ public:
     void findProduct(string prodName)
     {
         bool present = false;
-        regex prodS(prodName);
+        regex prodS(".*" + prodName + ".*");
         for (auto& product : products)
         {
             if (regex_match(product.getName(), prodS))
@@ -173,7 +202,7 @@ public:
             cout << "Product was not found!...";
         } 
 
-    }
+    } // findProduct
 
     void listAll()
     {
@@ -195,39 +224,77 @@ public:
         {
             cout << "No products were found...";
         }
-    }
+    } //listAll
+
+    void updateItem(string prodName)
+    {
+      bool present = false;
+      char choice;
+      regex prodS(".*" + prodName + ".*");
+      for (auto& product : products)
+      {
+        if (regex_match(product.getName(), prodS))
+        {
+          cout << "1.Product name: " << product.getName() << endl;
+          cout << "2.Product ID: " << product.getID() << endl;
+          cout << "3.Product price: " << product.getPrice() << endl;
+          cout << "4.Product quantaty: " << product.getQuantaty() << endl;
+          cout << "Please choose the number of the item to change: ";
+          cin >> choice;
+          cout << endl;
+
+          switch(choice)
+          {
+            case '1':
+            {
+              string tempName;
+              cout << "\nChange product name to: ";
+              cin.ignore();
+              getline(cin, tempName);
+              product.setName(tempName);
+              break;
+            }
+            case '2':
+            {
+              string tempID;
+              cout << "\nChange product ID to: ";
+              cin.ignore();
+              getline(cin, tempID);
+              product.setID(tempID);
+              break;
+            }
+            case '3':
+            {
+              float tempPrice;
+              cout << "\nChange product price: ";
+              tempPrice = getInputNum<float>();
+              product.setPrice(tempPrice);
+              break;
+            }
+            case '4':
+            {
+              int tempQuant;
+              cout << "\nChange product quantaty: ";
+              tempQuant = getInputNum<int>();
+              product.setQuantaty(tempQuant);
+              break;
+            }
+            default:
+              cout << "Not a valid choice, nothing changed...";
+
+          }
+          present = true;
+          break;
+ 
+        }
+      }
+
+    } //UodateItemw
 
 };
 
 
-template <typename T>
-T getInputNum() {
-  string input;
-  T number;
-  regex intPattern("^(0|[1-9][0-9]*)$");
-  regex floatPattern("^(0|[1-9][0-9]*\\.?[0-9]*)$");
-  for (int i = 0; i != ALLOWED_ATTEMPTS; ++i) //three attemps allowed
-  {
-    std::cin >> input;
-    if (regex_match(input, intPattern))
-    {
-      number = stoi(input);
-      break;
-    }
-    else if (regex_match(input, floatPattern))
-    {
-      number = stof(input);
-      break;
-    }
-    else 
-    { 
-      cout << "\nWrong input, please insert again: ";
-      cin.clear();
-      cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    }
-  }
-  return number;
-}
+
 
 int main()
 {
@@ -275,7 +342,11 @@ int main()
         }
         case '3':
         {
-            cout << "In development...";
+            string productName;
+            cout << "Please insert the name of the product: ";
+            cin.ignore();
+            getline(cin, productName);
+            inventory.updateItem(productName);
             break;
         }
         case '4':
